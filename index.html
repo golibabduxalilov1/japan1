@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yapon Tili Quiz</title>
+    <!-- Tailwind CSS yuklash -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+        }
+        .japanese-text {
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        
+        /* 10 soniyalik kutish animatsiyasi uchun taymer chizig'i */
+        @keyframes shrink {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+        .timer-bar {
+            height: 4px;
+            background-color: #3b82f6;
+            border-radius: 2px;
+            transition: width 0.1s linear;
+        }
+        .timer-active {
+            animation: shrink 10s linear forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Asosiy Konteyner -->
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden relative">
+        
+        <!-- HEADER -->
+        <div class="bg-red-500 p-6 text-center">
+            <h1 class="text-2xl font-bold text-white tracking-wide">Yapon Tili Quiz</h1>
+            <p class="text-red-100 text-sm mt-1">Hiragana va Katakanani o'rganamiz</p>
+        </div>
+
+        <div class="p-6">
+            <!-- 1. TANLOV EKRANI -->
+            <div id="home-screen" class="text-center space-y-6">
+                <p class="text-gray-600 font-medium">Qaysi alifboda test ishlamoqchisiz?</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="startQuiz('hiragana')" class="flex flex-col items-center justify-center py-8 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-2xl border-2 border-blue-200 transition duration-200 group">
+                        <span class="text-4xl japanese-text mb-2 group-hover:scale-110 transition">あ</span>
+                        <span class="font-semibold">Hiragana</span>
+                    </button>
+                    <button onclick="startQuiz('katakana')" class="flex flex-col items-center justify-center py-8 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-2xl border-2 border-purple-200 transition duration-200 group">
+                        <span class="text-4xl japanese-text mb-2 group-hover:scale-110 transition">ア</span>
+                        <span class="font-semibold">Katakana</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. QUIZ EKRANI -->
+            <div id="quiz-screen" class="hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-sm font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full" id="question-counter">Savol: 1/10</span>
+                    <span class="text-sm font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full" id="score-counter">Xol: 0</span>
+                </div>
+
+                <div class="text-center mb-8">
+                    <h2 id="japanese-word" class="text-6xl font-bold text-gray-800 japanese-text mb-2"></h2>
+                    <p id="uzbek-meaning" class="text-lg text-gray-500 font-medium"></p>
+                </div>
+
+                <div class="space-y-3" id="options-container">
+                    <!-- Javoblar shu yerga tushadi -->
+                </div>
+
+                <!-- 10 Sekundlik Taymer (javob berilgandan so'ng chiqadi) -->
+                <div id="timer-container" class="mt-6 hidden">
+                    <div class="flex justify-between text-xs text-gray-400 mb-1">
+                        <span>Keyingi savolga o'tilmoqda...</span>
+                        <span id="timer-text">10s</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-1.5">
+                        <div id="timer-bar" class="timer-bar"></div>
+                    </div>
+                    <button onclick="nextQuestion()" class="w-full mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-xl font-medium transition duration-200">
+                        Kutmasdan o'tish (Skip)
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. NATIJA EKRANI -->
+            <div id="result-screen" class="hidden text-center space-y-6 py-4">
+                <div class="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Test Yakunlandi!</h2>
+                <p class="text-gray-600">Sizning natijangiz:</p>
+                <div class="text-5xl font-extrabold text-blue-600" id="final-score">0 / 10</div>
+                <button onclick="goHome()" class="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-semibold shadow-lg transition duration-200 mt-6">
+                    Bosh sahifaga qaytish
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tashqi JSON fayl o'qish imkoni bo'lmasa, zaxira (fallback) ma'lumotlar
+        const fallbackData = {
+            hiragana: [
+                {"word": "さくら", "meaning": "Gilos guli", "options": ["sakura", "sakara", "sokura"], "answer": "sakura"},
+                {"word": "ねこ", "meaning": "Mushuk", "options": ["neko", "neku", "nako"], "answer": "neko"},
+                {"word": "いぬ", "meaning": "It", "options": ["inu", "imo", "enu"], "answer": "inu"},
+                {"word": "くるま", "meaning": "Mashina", "options": ["kuruma", "karuma", "kurama"], "answer": "kuruma"},
+                {"word": "あした", "meaning": "Ertaga", "options": ["ashita", "ashito", "oshita"], "answer": "ashita"},
+                {"word": "りんご", "meaning": "Olma", "options": ["ringo", "rengo", "rango"], "answer": "ringo"},
+                {"word": "みず", "meaning": "Suv", "options": ["mizu", "mezu", "misu"], "answer": "mizu"},
+                {"word": "ほん", "meaning": "Kitob", "options": ["hon", "han", "pon"], "answer": "hon"},
+                {"word": "でんわ", "meaning": "Telefon", "options": ["denwa", "danwa", "tenwa"], "answer": "denwa"},
+                {"word": "ともだち", "meaning": "Do'st", "options": ["tomodachi", "tomodati", "tamodachi"], "answer": "tomodachi"}
+            ],
+            katakana: [
+                {"word": "テレビ", "meaning": "Televizor", "options": ["terebi", "tarebi", "teribe"], "answer": "terebi"},
+                {"word": "カメラ", "meaning": "Kamera", "options": ["kamera", "kamara", "komera"], "answer": "kamera"},
+                {"word": "パソコン", "meaning": "Kompyuter", "options": ["pasokon", "basokon", "posokon"], "answer": "pasokon"},
+                {"word": "コーヒー", "meaning": "Qahva", "options": ["koohii", "kouhii", "koohee"], "answer": "koohii"},
+                {"word": "ホテル", "meaning": "Mehmonxona", "options": ["hoteru", "hatoru", "hotaru"], "answer": "hoteru"},
+                {"word": "タクシー", "meaning": "Takshi", "options": ["takushii", "takshii", "takushie"], "answer": "takushii"},
+                {"word": "バス", "meaning": "Avtobus", "options": ["basu", "pasu", "basa"], "answer": "basu"},
+                {"word": "パン", "meaning": "Non", "options": ["pan", "ban", "pon"], "answer": "pan"},
+                {"word": "トイレ", "meaning": "Hojatxona", "options": ["toire", "toira", "taire"], "answer": "toire"},
+                {"word": "ドア", "meaning": "Eshik", "options": ["doa", "daa", "toa"], "answer": "doa"}
+            ]
+        };
+
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let timerInterval;
+        let timeoutId;
+
+        // UI Elementlar
+        const homeScreen = document.getElementById('home-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        
+        const questionCounterEl = document.getElementById('question-counter');
+        const scoreCounterEl = document.getElementById('score-counter');
+        const jpWordEl = document.getElementById('japanese-word');
+        const uzMeaningEl = document.getElementById('uzbek-meaning');
+        const optionsContainer = document.getElementById('options-container');
+        const timerContainer = document.getElementById('timer-container');
+        const timerBar = document.getElementById('timer-bar');
+        const timerText = document.getElementById('timer-text');
+
+        // JSON fayllardan o'qish funksiyasi
+        async function loadData(type) {
+            try {
+                // Avval fayldan olishga urinadi
+                const response = await fetch(`${type}.json`);
+                if (!response.ok) throw new Error("Fayl topilmadi");
+                const data = await response.json();
+                return shuffleArray(data);
+            } catch (error) {
+                console.warn(`JSON fayl o'qilmadi. Zaxira ma'lumot ishlatilmoqda. (${error.message})`);
+                // Agar fayl topilmasa (masalan preview muhitida) zaxirani beradi
+                return shuffleArray([...fallbackData[type]]);
+            }
+        }
+
+        // Massivni aralashtirish funksiyasi (so'zlar va javoblar doim bir xil tartibda chiqmasligi uchun)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Quizni boshlash
+        async function startQuiz(type) {
+            // Ekranni tozalash va Loading
+            homeScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            
+            // Ma'lumotlarni yuklash
+            currentQuestions = await loadData(type);
+            currentIndex = 0;
+            score = 0;
+            
+            quizScreen.classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            clearTimeout(timeoutId);
+            clearInterval(timerInterval);
+            timerContainer.classList.add('hidden');
+            timerBar.classList.remove('timer-active');
+            
+            const currentQ = currentQuestions[currentIndex];
+            
+            // UI ni yangilash
+            questionCounterEl.innerText = `Savol: ${currentIndex + 1}/${currentQuestions.length}`;
+            scoreCounterEl.innerText = `Xol: ${score}`;
+            jpWordEl.innerText = currentQ.word;
+            uzMeaningEl.innerText = `- ${currentQ.meaning} -`;
+            
+            // Javoblarni aralashtirish
+            const shuffledOptions = shuffleArray([...currentQ.options]);
+            
+            optionsContainer.innerHTML = '';
+            
+            shuffledOptions.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left px-5 py-4 rounded-xl font-medium text-lg border-2 border-gray-100 bg-gray-50 hover:bg-gray-100 hover:border-blue-300 transition duration-200 outline-none';
+                btn.innerText = option;
+                btn.onclick = () => checkAnswer(btn, option, currentQ.answer);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedBtn, selectedAnswer, correctAnswer) {
+            // Barcha tugmalarni o'chirish (qayta bosilmasligi uchun)
+            const buttons = optionsContainer.querySelectorAll('button');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('hover:bg-gray-100', 'hover:border-blue-300');
+                
+                // To'g'ri javobni ko'rsatib qo'yish
+                if (btn.innerText === correctAnswer) {
+                    btn.classList.remove('bg-gray-50', 'border-gray-100');
+                    btn.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+                }
+            });
+
+            // Agar foydalanuvchi noto'g'ri topsa, uni qizil qilish
+            if (selectedAnswer !== correctAnswer) {
+                selectedBtn.classList.remove('bg-gray-50', 'border-gray-100');
+                selectedBtn.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
+            } else {
+                score++;
+                scoreCounterEl.innerText = `Xol: ${score}`;
+            }
+
+            // 10 soniya kutish va animatsiyani yoqish
+            startWaitTimer();
+        }
+
+        function startWaitTimer() {
+            timerContainer.classList.remove('hidden');
+            
+            // Animatsiyani qayta ishga tushirish uchun trick
+            timerBar.style.animation = 'none';
+            timerBar.offsetHeight; /* trigger reflow */
+            timerBar.style.animation = 'shrink 10s linear forwards';
+            
+            let timeLeft = 10;
+            timerText.innerText = `${timeLeft}s`;
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerText.innerText = `${timeLeft}s`;
+            }, 1000);
+
+            // 10 soniyadan so'ng avtomatik keyingi savol
+            timeoutId = setTimeout(() => {
+                nextQuestion();
+            }, 10000);
+        }
+
+        function nextQuestion() {
+            clearInterval(timerInterval);
+            clearTimeout(timeoutId);
+            
+            currentIndex++;
+            if (currentIndex < currentQuestions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            document.getElementById('final-score').innerText = `${score} / ${currentQuestions.length}`;
+        }
+
+        function goHome() {
+            resultScreen.classList.add('hidden');
+            homeScreen.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

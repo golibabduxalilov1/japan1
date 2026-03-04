@@ -1,0 +1,12 @@
+[
+  {"word": "さくら", "meaning": "Gilos guli", "options": ["sakura", "sakara", "sokura"], "answer": "sakura"},
+  {"word": "ねこ", "meaning": "Mushuk", "options": ["neko", "neku", "nako"], "answer": "neko"},
+  {"word": "いぬ", "meaning": "It", "options": ["inu", "imo", "enu"], "answer": "inu"},
+  {"word": "くるま", "meaning": "Mashina", "options": ["kuruma", "karuma", "kurama"], "answer": "kuruma"},
+  {"word": "あした", "meaning": "Ertaga", "options": ["ashita", "ashito", "oshita"], "answer": "ashita"},
+  {"word": "りんご", "meaning": "Olma", "options": ["ringo", "rengo", "rango"], "answer": "ringo"},
+  {"word": "みず", "meaning": "Suv", "options": ["mizu", "mezu", "misu"], "answer": "mizu"},
+  {"word": "ほん", "meaning": "Kitob", "options": ["hon", "han", "pon"], "answer": "hon"},
+  {"word": "でんわ", "meaning": "Telefon", "options": ["denwa", "danwa", "tenwa"], "answer": "denwa"},
+  {"word": "ともだち", "meaning": "Do'st", "options": ["tomodachi", "tomodati", "tamodachi"], "answer": "tomodachi"}
+]

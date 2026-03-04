@@ -1,0 +1,12 @@
+[
+  {"word": "テレビ", "meaning": "Televizor", "options": ["terebi", "tarebi", "teribe"], "answer": "terebi"},
+  {"word": "カメラ", "meaning": "Kamera", "options": ["kamera", "kamara", "komera"], "answer": "kamera"},
+  {"word": "パソコン", "meaning": "Kompyuter", "options": ["pasokon", "basokon", "posokon"], "answer": "pasokon"},
+  {"word": "コーヒー", "meaning": "Qahva", "options": ["koohii", "kouhii", "koohee"], "answer": "koohii"},
+  {"word": "ホテル", "meaning": "Mehmonxona", "options": ["hoteru", "hatoru", "hotaru"], "answer": "hoteru"},
+  {"word": "タクシー", "meaning": "Takshi", "options": ["takushii", "takshii", "takushie"], "answer": "takushii"},
+  {"word": "バス", "meaning": "Avtobus", "options": ["basu", "pasu", "basa"], "answer": "basu"},
+  {"word": "パン", "meaning": "Non", "options": ["pan", "ban", "pon"], "answer": "pan"},
+  {"word": "トイレ", "meaning": "Hojatxona", "options": ["toire", "toira", "taire"], "answer": "toire"},
+  {"word": "ドア", "meaning": "Eshik", "options": ["doa", "daa", "toa"], "answer": "doa"}
+]
